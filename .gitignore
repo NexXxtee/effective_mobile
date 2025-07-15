@@ -2,7 +2,6 @@ bvenv/
 venv/
 env/
 
-
 .vscode/
 */migrations/__pycache__/
 
