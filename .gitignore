@@ -1,0 +1,11 @@
+bvenv/
+env/
+
+
+.vscode/
+*/migrations/__pycache__/
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

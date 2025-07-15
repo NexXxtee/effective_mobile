@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    {% for ad in ads %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if ad.image_url %}
+                    <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/300x200?text=Нет+фото" class="card-img-top" alt="Нет фото">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ ad.title }}</h5>
+                    <p class="card-text text-truncate">{{ ad.description }}</p>
+                    <span class="badge bg-secondary">{{ ad.category.name }}</span>
+                    <span class="badge bg-info text-dark">{{ ad.get_condition_display }}</span>
+                    <p class="text-muted mt-2 mb-0" style="font-size: 0.9em;">Опубликовано: {{ ad.created_at|date:"d.m.Y H:i" }}</p>
+                </div>
+                <div class="card-footer bg-white border-top-0">
+                    <a href="{% url 'ads:ad_detail' ad.pk %}" class="btn btn-outline-primary btn-sm w-100">Подробнее</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                Нет объявлений для обмена.
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<nav aria-label="Пагинация">
+    {% if ads.has_other_pages %}
+    <ul class="pagination justify-content-center">
+        {% if ads.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ads.previous_page_number }}">Назад</a>
+            </li>
+        {% endif %}
+        {% for num in ads.paginator.page_range %}
+            {% if ads.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if ads.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ ads.next_page_number }}">Вперёд</a>
+            </li>
+        {% endif %}
+    </ul>
+    {% endif %}
+</nav>
+{% endblock %}

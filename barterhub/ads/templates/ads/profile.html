@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Профиль пользователя</h4>
+                <p><strong>Имя:</strong> {{ request.user.get_full_name|default:request.user.username }}</p>
+                <p><strong>Email:</strong> {{ request.user.email }}</p>
+                <p><strong>Логин:</strong> {{ request.user.username }}</p>
+                <a href="{% url 'users:logout' %}" class="btn btn-outline-danger btn-sm mt-2">Выйти</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h4 class="mb-3">Мои объявления</h4>
+        <!-- Форма фильтрации -->
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <input type="text" name="search" class="form-control" placeholder="Поиск по названию или описанию" value="{{ request.GET.search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">Все категории</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="condition" class="form-select">
+                    <option value="">Любое состояние</option>
+                    <option value="new" {% if request.GET.condition == "new" %}selected{% endif %}>Новый</option>
+                    <option value="used" {% if request.GET.condition == "used" %}selected{% endif %}>Б/у</option>
+                </select>
+            </div>
+            <div class="col-md-3 text-end">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Фильтровать</button>
+            </div>
+        </form>
+        {% if ads %}
+            <div class="row">
+                {% for ad in ads %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            {% if ad.image_url %}
+                                <img src="{{ ad.image_url }}" class="card-img-top" alt="{{ ad.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ ad.title }}</h5>
+                                <p class="card-text text-truncate">{{ ad.description }}</p>
+                                <span class="badge bg-secondary">{{ ad.category.name }}</span>
+                                <span class="badge bg-info text-dark">{{ ad.get_condition_display }}</span>
+                                <p class="text-muted mb-0" style="font-size: 0.9em;">{{ ad.created_at|date:"d.m.Y H:i" }}</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <a href="{% url 'ads:ad_detail' ad.pk %}" class="btn btn-outline-primary btn-sm w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">У вас нет объявлений.</div>
+        {% endif %}
+
+        <h4 class="mt-4 mb-3">Обменные предложения</h4>
+        {% if proposals %}
+            <div class="list-group">
+                {% for proposal in proposals %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>От:</strong> {{ proposal.ad_sender.user.get_full_name|default:proposal.ad_sender.user.username }}<br>
+                                <strong>Кому:</strong> {{ proposal.ad_receiver.user.get_full_name|default:proposal.ad_receiver.user.username }}<br>
+                                <strong>Объявление:</strong> <a href="{% url 'ads:ad_detail' proposal.ad_receiver.pk %}">{{ proposal.ad_receiver.title }}</a><br>
+                                <strong>Комментарий:</strong> {{ proposal.comment|default:"-" }}
+                            </div>
+                            <span class="badge {% if proposal.status == 'accepted' %}bg-success{% elif proposal.status == 'declined' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ proposal.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="mt-2">
+                            {% if proposal.status == 'pending' %}
+                                {% if proposal.ad_sender.user == request.user %}
+                                    <form method="post" action="{% url 'ads:proposal_status' proposal.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="cancel" class="btn btn-danger btn-sm">Отменить</button>
+                                    </form>
+                                {% elif proposal.ad_receiver.user == request.user %}
+                                    <form method="post" action="{% url 'ads:proposal_status' proposal.pk %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">Принять</button>
+                                    </form>
+                                {% endif %}
+                            {% elif proposal.status == 'accepted' %}
+                                <div class="mt-2">
+                                    {% if proposal.ad_sender.user == request.user %}
+                                        <strong>Контакты получателя:</strong> {{ proposal.ad_receiver.user.email }}
+                                    {% else %}
+                                        <strong>Контакты отправителя:</strong> {{ proposal.ad_sender.user.email }}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted mt-1" style="font-size: 0.9em;">{{ proposal.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info mt-2">Нет обменных предложений.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

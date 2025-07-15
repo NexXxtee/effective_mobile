@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="display-4 text-danger">404</h1>
+    <p class="lead">Страница не найдена</p>
+    <p class="text-muted">Возможно, объявление было удалено или вы перешли по неверной ссылке.</p>
+    <a href="{% url 'ads:ad_list' %}" class="btn btn-primary mt-3">На главную</a>
+</div>
+{% endblock %}

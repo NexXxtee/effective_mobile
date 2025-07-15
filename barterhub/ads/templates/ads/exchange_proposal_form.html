@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-4">
+                <h3 class="mb-4 text-center">Предложить бартер</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="mb-3">
+                        {{ form.ad_sender.label_tag }}
+                        {{ form.ad_sender }}
+                        {% if form.ad_sender.errors %}
+                            <div class="text-danger small">{{ form.ad_sender.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.comment.label_tag }}
+                        {{ form.comment }}
+                        {% if form.comment.errors %}
+                            <div class="text-danger small">{{ form.comment.errors|join:", " }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Отправить предложение</button>
+                </form>
+                <hr>
+                <div class="text-center">
+                    <a href="{% url 'ads:ad_detail' ad_receiver.pk %}" class="btn btn-link">Назад к объявлению</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
