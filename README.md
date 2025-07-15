@@ -6,7 +6,7 @@ BarterHub — это Django-приложение для размещения о�
 
 1. **Клонируйте репозиторий:**
    ```
-   git clone https://github.com/NexXxtee/coursereview
+   git clone https://github.com/NexXxtee/effective_mobile
    cd effective_mobile
    ```
 
