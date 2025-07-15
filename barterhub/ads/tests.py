@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from .models import Ad, Category, ExchangeProposal
 
+
 class AdModelTest(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(username='testuser', password='12345')
@@ -107,3 +108,5 @@ class AdListSearchTest(TestCase):
         self.assertContains(response, 'Iphone')
         self.assertNotContains(response, 'Samsung Galaxy')
         self.assertNotContains(response, 'Ноутбук')
+        
+        
